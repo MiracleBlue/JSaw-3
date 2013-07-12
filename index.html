@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>LOL JUST KIDDING</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+
+        <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+		<!-- Bootstrap-->
+		<link href="js/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+		<!--<link href="js/lib/bootstrap/css/geostrap.css" rel="stylesheet" media="screen">-->
+		<link href="js/vendor/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet" media="screen">
+
+        <link rel="stylesheet" href="css/normalize.css">
+        <link rel="stylesheet" href="css/main.css">
+        <script src="js/vendor/modernizr-2.6.2.min.js"></script>
+    </head>
+	<body>
+
+		<script type="text/x-handlebars">
+			<div class="container well">
+				<h2>Welcome to Ember.js</h2>
+
+				{{view App.MainView}}
+			</div>
+
+		</script>
+
+
+		<script src="js/vendor/jquery-1.9.1.js"></script>
+		<script src="js/vendor/lodash.underscore.min.js"></script>
+		<script src="js/vendor/handlebars-1.0.0-rc.4.js"></script>
+		<script src="js/vendor/ember-1.0.0-rc.6.js"></script>
+		<script src="js/vendor/audiolet.js"></script>
+		<script src="js/vendor/audiofile.js"></script>
+		<script>
+			var require = {
+				paths: {
+					"instrument": "core/instrument",
+					"generator": "dsp/generator"
+				}
+			};
+		</script>
+		<script data-main="js/app.js" src="js/vendor/require.js"></script>
+
+	</body>
+</html>
