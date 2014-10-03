@@ -9,6 +9,7 @@ define(function() {
 		octave: 3,
 		velocity: 1,
 		duration: 1,
+		position: 0,
 		frequency: function() {
 			return App.NoteLib.fromLatin(this.get("key").capitalize() + this.get("octave")).frequency();
 		}.property("key", "octave"),
@@ -19,6 +20,7 @@ define(function() {
 			this._super();
 			//console.log(this.get("key"));
 			//console.log(this.key);
+			console.log(this.getProperties("key", "octave", "velocity", "position","duration"));
 		},
 		noteOn: function() {
 			this.trigger("noteOn");

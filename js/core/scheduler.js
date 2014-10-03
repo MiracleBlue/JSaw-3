@@ -9,6 +9,7 @@ define(function() {
 
 	var Scheduler = Ember.Object.extend({
 		bpm: 130,
+		audiolet: null,
 		scheduler: null,
 		playbackStore: null,
 
@@ -16,23 +17,33 @@ define(function() {
 			this._super();
 
 			// stuff here
-			this.scheduler = App.audiolet.scheduler;
+			this.scheduler = this.audiolet.scheduler;
 
 			this.playbackStore = PlaybackStore.create();
 		},
 
 		play: function (args, options) {
-			this.playbackStore.addObject(
-				Playback.create({
-					state: this.scheduler.play(
-						[new PSequence([args], (options.repeat || Infinity))],
+			var self = this;
+
+			var playbackObject = Playback.create({
+				state: self.scheduler.play(
+					[new PSequence([args], (options.repeat * options.steps || Infinity))],
 						(options.per_beat || 1) / 4,
-						options.callback
-					)
-				})
+					options.callback
+				),
+				end: function() {
+					console.log("end!")
+					self.scheduler.remove(this.get("state"));
+					self.playbackStore.removeObject(this);
+				}
+			});
+			this.playbackStore.addObject(
+				playbackObject
 			);
 
 			console.log("playbackStore", this.playbackStore);
+
+			return playbackObject;
 		},
 
 		stop: function() {

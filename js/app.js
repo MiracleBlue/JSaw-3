@@ -4,13 +4,17 @@ define([
 	"./core/midi/midinote", // MidiNote
 	"./core/scheduler", // Scheduler
 	"./core/sequencer",
-	"./instruments/default-sawtooth/DefaultSawtooth"
+	"./components/supergrid/SuperGrid",
+	"./instruments/default-sawtooth/DefaultSawtooth",
+	"./fastCollection"
 ], function(
 	NoteLib,
 	MidiNote,
 	Scheduler,
 	Sequencer,
-	DefaultSawtooth
+	SuperGrid,
+	DefaultSawtooth,
+	FastCollection
 ) {
 	var ObjectCollection = Ember.ArrayController.extend({
 
@@ -28,7 +32,9 @@ define([
 			this._super();
 			// Do stuff here
 
-			this.scheduler = Scheduler.create();
+			this.scheduler = Scheduler.create({
+				audiolet: App.audiolet
+			});
 		}
 	});
 
@@ -68,18 +74,21 @@ define([
 			return new audioNode(this.get("audiolet"));
 		},
 
+		SuperGrid: SuperGrid.create(),
+
 		MainView: Ember.View.extend({
 			init: function() {
 				this._super();
 
 				console.log(this);
 				//this.restartView();
+				App.SuperGrid.restartView();
 			},
 			classNames: ["derp"],
 			restartView: function() {
 				this.rerender();
 			},
-			template: Ember.Handlebars.compile("<h1>Hello!</h1>")
+			template: Ember.Handlebars.compile("<h1>Hello!</h1><div id='content'>{{view App.SuperGrid.mainView}}</div>")
 		})
 	});
 
@@ -137,21 +146,29 @@ define([
 		})
 	]);
 
+	window.testRows = testRows;
+
 	window.testSequencer = Sequencer.create({
-		instrument: App.Instrument,
-		rows: testRows
+		instrument: App.Instrument
 	});
 
 	console.log(testSequencer);
 
 	App.Instrument.node.connect(App.audiolet.output);
 
-	var testNote = MidiNote.create({key: "A"});
+	var testNote = MidiNote.create({key: "A", duration: 4, position: 2});
 
-	App.Instrument.playNotes(testNote);
+	testSequencer.addNote(MidiNote.create({key: "C", duration: 2, position: 8}));
+	testSequencer.addNote(testNote);
+
+	//App.Instrument.playNotes(testNote);
 
 	setTimeout(function() {
-		testNote.noteOff();
+		//testNote.noteOff();
 	}, 1000);
+
+	console.log($("#content"));
+
+
 
 });

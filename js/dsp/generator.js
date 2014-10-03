@@ -8,6 +8,7 @@ define([
 		node: null,
 
 		frequency: null,
+		sustain: 1,
 		attack: 0.01,
 		decay: 0.15,
 		release: 0.01,
@@ -28,12 +29,13 @@ define([
 			this.gain = new Gain(App.audiolet);
 
 			// The sustain is set to 1 so that the release stage will not trigger until the gate is closed, which happens at noteOff
-			this.envelope = new ADSREnvelope(App.audiolet, 1, this.get("attack"), this.get("decay"), 1, this.get("release"), function() {
+			this.envelope = new ADSREnvelope(App.audiolet, 1, this.get("attack"), this.get("decay"), this.get("sustain"), this.get("release"), function() {
 				self.trigger("complete");
 			});
 
 			// This bit is absolutely required in order for things to work properly.
 			this.midiNote.on("noteOff", function() {
+				// This sets the envelope state to release
 				self.envelope.gate.setValue(0);
 			});
 		},
