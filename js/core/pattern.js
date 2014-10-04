@@ -1,7 +1,25 @@
-define(function() {
-	return Ember.Object.extend({
+define(["../fastCollection"], function(FastCollection) {
+	return Ember.Object.extend(Ember.Evented, {
 		steps: 16,
 		items: null,
-		name: "Some Pattern"
-	})
-})
+		name: "Some Pattern",
+		init: function() {
+			this._super();
+
+			var fc = FastCollection.create({
+				content: this.get("items") || []
+			});
+			this.set("items", fc);
+
+			console.log("pattern", this.get("items"));
+		},
+		addNotes: function(notes) {
+			this.get("items").addObjects(notes);
+			return this;
+		},
+		removeNotes: function(notes) {
+			this.get("items").removeObjects(notes);
+			return this;
+		}
+	});
+});

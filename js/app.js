@@ -149,17 +149,17 @@ define([
 	window.testRows = testRows;
 
 	window.testSequencer = Sequencer.create({
-		instrument: App.Instrument
+		instrument: App.Instrument,
+		pattern: [
+			MidiNote.create({key: "A", duration: 4, position: 2}),
+			MidiNote.create({key: "C", duration: 4, position: 2}),
+			MidiNote.create({key: "C", duration: 2, position: 8})
+		]
 	});
 
 	console.log(testSequencer);
 
 	App.Instrument.node.connect(App.audiolet.output);
-
-	var testNote = MidiNote.create({key: "A", duration: 4, position: 2});
-
-	testSequencer.addNote(MidiNote.create({key: "C", duration: 2, position: 8}));
-	testSequencer.addNote(testNote);
 
 	//App.Instrument.playNotes(testNote);
 

@@ -9,9 +9,9 @@ define([
 
 		frequency: null,
 		sustain: 1,
-		attack: 0.01,
+		attack: 0.51,
 		decay: 0.15,
-		release: 0.01,
+		release: 0.21,
 
 		init: function() {
 			this._super();

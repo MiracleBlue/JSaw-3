@@ -1,23 +1,10 @@
 define([
-	"./pattern"
+	"./pattern",
+	"../fastCollection"
 ], function (
-	Pattern
+	Pattern,
+	FastCollection
 ) {
-	var Point = Ember.Object.extend({
-		row: null,
-		step: null,
-		note: null
-	});
-
-	var Points = Ember.ArrayController.extend({
-
-	});
-
-
-
-	var RowsCollection = Ember.ArrayController.extend({
-		// Something could go in here I guess
-	});
 
 	// The sequencer should always be associated with a pattern model (maybe?)
 	// The sequencer should always be associated with an Instrument object.
@@ -29,32 +16,25 @@ define([
 		step: 0,
 		name: "Sequencer Derp",
 		instrument: null,
+
 		currentlyPlayingNotes: null,
-		notes: null,
+		pattern: null,
+
+		playbackObject: null,
 
 		init: function () {
 			this._super();
 
 			// stuff here
 			this.currentlyPlayingNotes = Ember.ArrayController.create();
-			this.notes = Ember.ArrayController.create();
 
-			var self = this;
+			console.log("sequencer", this.get("pattern"));
 
-			for (var i = 0; i < this.get("steps"); i++) {
-				this.notes.addObject(Ember.ArrayController.create());
-			}
-		},
-
-		addNote: function(note) {
-			// Okay this looks up the point at said step, and the row that the note should be on.
-			var lookupString = note.get("latin");
-			var self = this;
-			//var row = this.rows.findProperty("latin", lookupString);
-			//var point = row.points.findProperty("step", note.get("position"));
-			//point.set("note", note); // I think this will work.
-
-			this.notes.objectAt(note.get("position")).addObject(note);
+			// Notes should be pattern, yeah?  I reckon.
+			// Then pattern can be FastCollection YEAH BABY
+			this.set("pattern", Pattern.create({
+				items: this.get("pattern") || null
+			}));
 		},
 
 		changePlaying: function() {
@@ -100,36 +80,35 @@ define([
 			});
 
 			console.log("play", playback);
+
+			this.set("playbackObject", playback);
+		},
+
+		stop: function() {
+			this.get("playbackObject").end();
 		},
 
 		changeStep: function() {
 			var self = this;
 
-			var playingNotes = this.currentlyPlayingNotes.map(function(item) {
+			var playingNotes = this.get("currentlyPlayingNotes").map(function(item) {
 				if (item.get("position") + item.get("duration") <= self.get("step")) {
-					console.log("noteOff", item);
 					item.noteOff();
 					return item;
 				}
 			});
 
-
-
-			//this.set("currentlyPlayingNotes", playingNotes);
-
 			if (playingNotes.get("length")) {
-				this.currentlyPlayingNotes.removeObjects(playingNotes);
-				console.log("playingNotes", playingNotes);
+				this.get("currentlyPlayingNotes").removeObjects(playingNotes);
 			}
+
 			// Change Step filters through Point objects
 			// Then it gets out the note from each step and feeds it to the instrument
-			var currentNotes = this.notes.objectAt(this.get("step"));
+			var currentNotes = this.get("pattern.items").getByProperty("position", this.get("step"));
 			if (currentNotes.get("length")) {
 				console.log("currentNotes", currentNotes);
-				this.currentlyPlayingNotes.addObjects(currentNotes);
-				currentNotes.forEach(function(item) {
-					self.instrument.playNotes(item);
-				});
+				this.get("currentlyPlayingNotes").addObjects(currentNotes);
+				self.instrument.playNotes(currentNotes);
 			}
 		}.observes("step")
 	});

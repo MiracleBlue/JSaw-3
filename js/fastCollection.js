@@ -1,38 +1,44 @@
 define(function() {
-	var FastCollection = Ember.ArrayController.extend({
-		memoizeKey: "position",
+	var FastCollection = Ember.ArrayController.extend(Ember.Evented, {
+		enableObserver: true,
 		lookupCache: {},
 		init: function() {
 			this._super();
 
-			console.log("collection", this.get("content"));
-
 			this.updateCache();
 		},
 		changeListener: function() {
-			console.log("change occurred!");
-
-			this.updateCache();
+			if (this.enableObserver) this.updateCache();
 		}.observes("content.@each"),
 		updateCache: function() {
-			var memoizeKey = this.get("memoizeKey");
 			var newCache = {};
+
 			this.get("content").forEach(function(item) {
-				var memoizeValue = item[memoizeKey];
-				if (!newCache[memoizeValue]) {
-					newCache[memoizeValue] = [];
-				}
-				newCache[memoizeValue].push(item);
+				var keys = Object.keys(item);
+				keys.forEach(function(memoizeKey) {
+					var memoizeValue = item[memoizeKey];
+					if (!newCache[memoizeKey]) newCache[memoizeKey] = {};
+
+					if (typeof memoizeValue === "number" || typeof memoizeValue === "string") {
+						if (!newCache[memoizeKey][memoizeValue]) {
+							newCache[memoizeKey][memoizeValue] = [item];
+						}
+						else newCache[memoizeKey][memoizeValue].push(item);
+					}
+
+				});
+
 			});
 			this.set("lookupCache", newCache);
+
+			this.trigger("collectionUpdated");
+			console.log("FC", this.get("lookupCache"), this.get("content"));
 		},
-		getItem: function(keyValue) {
+		getByProperty: function(key, value) {
 			// Should make this the fastest ever get-by-property-value.
-			return this.get("lookupCache")[keyValue];
+			return this.get("lookupCache")[key][value] || [];
 		}
 	});
-
-	window.FastCollection = FastCollection;
 
 	return FastCollection;
 });
