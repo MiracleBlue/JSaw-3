@@ -57,53 +57,6 @@ define([
 			});
 		},
 
-		changePlaying: function() {
-			var self = this;
-
-			if (this.get("playing")) {
-				// The callback describes how to move the steps forward to the scheduler
-				App.state.scheduler.play([], {
-					callback: function() {
-						var step = self.get("step");
-						var reset = (step === self.get("pattern.steps") - 1);
-						var next = reset ? 0 : step + 1;
-
-						self.set("step", next);
-					}
-				});
-			}
-			else {
-				this.currentlyPlayingNotes.forEach(function(item) {
-					item.noteOff();
-				});
-				this.currentlyPlayingNotes.clear();
-				App.state.scheduler.stop();
-			}
-		},
-
-		play: function() {
-			var self = this;
-
-			// The callback describes how to move the steps forward to the scheduler
-			var playback = App.state.scheduler.play([], {
-				callback: function() {
-					var step = self.get("step");
-					var reset = (step === self.get("steps") - 1);
-					var next = reset ? 0 : step + 1;
-
-					self.set("step", next);
-
-					if (reset) playback.end();
-				},
-				steps: self.get("steps"),
-				repeat: 1
-			});
-
-			console.log("play", playback);
-
-			this.set("playbackObject", playback);
-		},
-
 		stop: function() {
 			this.get("currentlyPlayingNotes").invoke("noteOff");
 			this.get("currentlyPlayingNotes").clear();
