@@ -1,9 +1,11 @@
 define([
 	"./pattern",
-	"../fastCollection"
+	"../fastCollection",
+	"./midi/midinote"
 ], function (
 	Pattern,
-	FastCollection
+	FastCollection,
+	MidiNote
 ) {
 
 	// The sequencer should always be associated with a pattern model (maybe?)
@@ -35,6 +37,24 @@ define([
 			this.set("pattern", Pattern.create({
 				items: this.get("pattern") || null
 			}));
+
+			var self = this;
+
+			var scheduler = App.state.scheduler;
+
+			scheduler.on("play", function() {
+				self.set("playing", true);
+			});
+			scheduler.on("pause", function() {
+				self.stop();
+			});
+			scheduler.on("stop", function() {
+				self.stop();
+			});
+			scheduler.on("changeStep", function(step) {
+				self.set("step", step);
+				self.playStep(step);
+			});
 		},
 
 		changePlaying: function() {
@@ -45,7 +65,7 @@ define([
 				App.state.scheduler.play([], {
 					callback: function() {
 						var step = self.get("step");
-						var reset = (step === self.get("steps") - 1);
+						var reset = (step === self.get("pattern.steps") - 1);
 						var next = reset ? 0 : step + 1;
 
 						self.set("step", next);
@@ -59,7 +79,7 @@ define([
 				this.currentlyPlayingNotes.clear();
 				App.state.scheduler.stop();
 			}
-		}.observes("playing"),
+		},
 
 		play: function() {
 			var self = this;
@@ -85,14 +105,15 @@ define([
 		},
 
 		stop: function() {
-			this.get("playbackObject").end();
+			this.get("currentlyPlayingNotes").invoke("noteOff");
+			this.get("currentlyPlayingNotes").clear();
 		},
 
-		changeStep: function() {
+		playStep: function(step) {
 			var self = this;
 
 			var playingNotes = this.get("currentlyPlayingNotes").map(function(item) {
-				if (item.get("position") + item.get("duration") <= self.get("step")) {
+				if (item.get("position") + item.get("duration") <= step) {
 					item.noteOff();
 					return item;
 				}
@@ -104,13 +125,13 @@ define([
 
 			// Change Step filters through Point objects
 			// Then it gets out the note from each step and feeds it to the instrument
-			var currentNotes = this.get("pattern.items").getByProperty("position", this.get("step"));
+			var currentNotes = this.get("pattern.items").getByProperty("position", step);
 			if (currentNotes.get("length")) {
 				console.log("currentNotes", currentNotes);
 				this.get("currentlyPlayingNotes").addObjects(currentNotes);
 				self.instrument.playNotes(currentNotes);
 			}
-		}.observes("step")
+		}
 	});
 
 	return Sequencer;

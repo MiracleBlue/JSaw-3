@@ -153,7 +153,8 @@ define([
 		pattern: [
 			MidiNote.create({key: "A", duration: 4, position: 2}),
 			MidiNote.create({key: "C", duration: 4, position: 2}),
-			MidiNote.create({key: "C", duration: 2, position: 8})
+			MidiNote.create({key: "C", duration: 1, position: 8}),
+			MidiNote.create({key: "F", duration: 1, position: 9}),
 		]
 	});
 

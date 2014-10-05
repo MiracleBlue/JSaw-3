@@ -7,11 +7,15 @@ define(function() {
 
 	});
 
-	var Scheduler = Ember.Object.extend({
+	var Scheduler = Ember.Object.extend(Ember.Evented, {
 		bpm: 130,
 		audiolet: null,
 		scheduler: null,
 		playbackStore: null,
+		playbackObject: null,
+		step: 0,
+		length: 16,
+		playing: false,
 
 		init: function() {
 			this._super();
@@ -22,35 +26,61 @@ define(function() {
 			this.playbackStore = PlaybackStore.create();
 		},
 
-		play: function (args, options) {
+		play: function() {
 			var self = this;
+
+			console.log("scheduler play", this.scheduler);
 
 			var playbackObject = Playback.create({
 				state: self.scheduler.play(
-					[new PSequence([args], (options.repeat * options.steps || Infinity))],
-						(options.per_beat || 1) / 4,
-					options.callback
+					[new PSequence([[]], (Infinity))],
+					1 / 4,
+					function() {
+						self.trigger("changeStep", self.get("step"));
+						var step = self.get("step");
+						var reset = (step === self.get("length") - 1);
+						var next = reset ? 0 : step + 1;
+
+						self.set("step", next);
+					}
 				),
-				end: function() {
-					console.log("end!")
+				removeFromPlayback: function() {
 					self.scheduler.remove(this.get("state"));
 					self.playbackStore.removeObject(this);
+				},
+				pause: function() {
+					self.set("playing", false);
+					self.trigger("pause");
+					this.removeFromPlayback();
+				},
+				end: function() {
+					console.log("end!");
+					self.set("playing", false);
+
+					self.trigger("stop");
+					this.removeFromPlayback();
+					self.set("step", 0);
 				}
 			});
+
 			this.playbackStore.addObject(
 				playbackObject
 			);
 
-			console.log("playbackStore", this.playbackStore);
+			this.set("playbackObject", playbackObject);
+			this.set("playing", true);
+
+			this.trigger("play", this.get("step"));
 
 			return playbackObject;
 		},
 
+		pause: function() {
+			this.get("playbackObject").pause();
+		},
+
 		stop: function() {
-			var self = this;
-			this.playbackStore.forEach(function(item) {
-				self.scheduler.remove(item.get("state"));
-			});
+			this.get("playbackObject").end();
 		},
 
 		// Observers
