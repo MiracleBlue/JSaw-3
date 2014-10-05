@@ -42,7 +42,7 @@ define([
 		// Some of the extra properties are redundant here so might be removed later on
 		name: "A",
 		octave: 3,
-		points: null, // reserved for storing the list of steps in this row's matrix
+		points: null, // reserved for storing the list of steps in this row's matrix, useless now
 		// computed
 		latin: function() {
 			return (this.get("name").capitalize() + this.get("octave"));
@@ -52,18 +52,66 @@ define([
 		}.property("key", "octave")
 	});
 
-	var Keys = Ember.ArrayController.extend({
+	var keys = Ember.ArrayController.create({
 		// Stuff might go here one day.
+		content: [
+			Key.create({
+				name: "C",
+				octave: 3
+			}),
+			Key.create({
+				name: "C#",
+				octave: 3
+			}),
+			Key.create({
+				name: "D",
+				octave: 3
+			}),
+			Key.create({
+				name: "D#",
+				octave: 3
+			}),
+			Key.create({
+				name: "E",
+				octave: 3
+			}),
+			Key.create({
+				name: "F",
+				octave: 3
+			}),
+			Key.create({
+				name: "F#",
+				octave: 3
+			}),
+			Key.create({
+				name: "G",
+				octave: 3
+			}),
+			Key.create({
+				name: "G#",
+				octave: 3
+			}),
+			Key.create({
+				name: "A",
+				octave: 3
+			}),
+			Key.create({
+				name: "B",
+				octave: 3
+			})
+		]
 	});
 
 	window.App = Ember.Application.create({
-		audiolet: new Audiolet(),
+		audiolet: null,
 
 		NoteLib: NoteLib,
 
 		MidiNote: MidiNote,
 
 		state: null,
+
+		views: null,
 
 		createAudioNode: function(numInputs, numOutputs) {
 			var audioNode = function(audiolet) {
@@ -74,93 +122,42 @@ define([
 			return new audioNode(this.get("audiolet"));
 		},
 
-		SuperGrid: SuperGrid.create(),
-
 		MainView: Ember.View.extend({
 			init: function() {
 				this._super();
 
+				App.set("audiolet", new Audiolet());
+				App.set("state", ApplicationState.create());
+				App.set("views", {
+					pianoRoll: SuperGrid.create({
+						rows: keys,
+						sequencer: Sequencer.create({
+							instrument: DefaultSawtooth.create(),
+							pattern: [
+								MidiNote.create({key: "A", duration: 4, position: 2}),
+								MidiNote.create({key: "C", duration: 4, position: 2}),
+								MidiNote.create({key: "C", duration: 1, position: 8}),
+								MidiNote.create({key: "F", duration: 1, position: 9}),
+							]
+						})
+					})
+				});
+
+				window.testSequencer = App.views.pianoRoll.sequencer;
+
 				console.log(this);
 				//this.restartView();
-				App.SuperGrid.restartView();
+				App.views.pianoRoll.restartView();
 			},
 			classNames: ["derp"],
 			restartView: function() {
 				this.rerender();
 			},
-			template: Ember.Handlebars.compile("<h1>Hello!</h1><div id='content'>{{view App.SuperGrid.mainView}}</div>")
+			template: Ember.Handlebars.compile("<h1>Hello!</h1><div id='content'>{{view App.views.pianoRoll.mainView}}</div>")
 		})
 	});
 
-	App.state = ApplicationState.create();
-
-	App.Instrument = DefaultSawtooth.create({
-
-	});
-
-	var testRows = Keys.create();
-	testRows.addObjects([
-		Key.create({
-			name: "C",
-			octave: 3
-		}),
-		Key.create({
-			name: "C#",
-			octave: 3
-		}),
-		Key.create({
-			name: "D",
-			octave: 3
-		}),
-		Key.create({
-			name: "D#",
-			octave: 3
-		}),
-		Key.create({
-			name: "E",
-			octave: 3
-		}),
-		Key.create({
-			name: "F",
-			octave: 3
-		}),
-		Key.create({
-			name: "F#",
-			octave: 3
-		}),
-		Key.create({
-			name: "G",
-			octave: 3
-		}),
-		Key.create({
-			name: "G#",
-			octave: 3
-		}),
-		Key.create({
-			name: "A",
-			octave: 3
-		}),
-		Key.create({
-			name: "B",
-			octave: 3
-		})
-	]);
-
-	window.testRows = testRows;
-
-	window.testSequencer = Sequencer.create({
-		instrument: App.Instrument,
-		pattern: [
-			MidiNote.create({key: "A", duration: 4, position: 2}),
-			MidiNote.create({key: "C", duration: 4, position: 2}),
-			MidiNote.create({key: "C", duration: 1, position: 8}),
-			MidiNote.create({key: "F", duration: 1, position: 9}),
-		]
-	});
-
-	console.log(testSequencer);
-
-	App.Instrument.node.connect(App.audiolet.output);
+	//console.log(testSequencer);
 
 	//App.Instrument.playNotes(testNote);
 

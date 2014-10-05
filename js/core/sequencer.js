@@ -58,6 +58,7 @@ define([
 		},
 
 		stop: function() {
+			this.set("playing", false);
 			this.get("currentlyPlayingNotes").invoke("noteOff");
 			this.get("currentlyPlayingNotes").clear();
 		},

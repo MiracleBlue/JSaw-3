@@ -36,7 +36,11 @@ define(function() {
 		},
 		getByProperty: function(key, value) {
 			// Should make this the fastest ever get-by-property-value.
-			return this.get("lookupCache")[key][value] || [];
+			var lc = this.get("lookupCache");
+			if (!lc[key]) {
+				console.error("Key ", key, " does not exist on this object");
+			}
+			else return lc[key][value] || [];
 		}
 	});
 

@@ -13,6 +13,7 @@ define([
 			this.createAudioNode();
 
 			//this.generator = Generator;
+			this.get("node").connect(App.get("audiolet").output);
 		},
 
 		createAudioNode: function() {

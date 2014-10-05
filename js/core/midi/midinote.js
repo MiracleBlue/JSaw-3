@@ -10,6 +10,7 @@ define(function() {
 		velocity: 1,
 		duration: 1,
 		position: 0,
+		selected: false,
 		frequency: function() {
 			return App.NoteLib.fromLatin(this.get("key").capitalize() + this.get("octave")).frequency();
 		}.property("key", "octave"),
