@@ -1,7 +1,8 @@
 define([
 	"../base/BaseComponent",
-	"./SuperGridView"
-], function (BaseComponent, SuperGridView) {
+	"./SuperGridView",
+	"./itemblock/ItemBlock"
+], function (BaseComponent, SuperGridView, ItemBlock) {
 
 	return BaseComponent.extend({
 		mainViewClass: SuperGridView,
@@ -21,7 +22,10 @@ define([
 		updateJunkStepArray: function() {
 			var jsa = [];
 			for (var i = 0; i < this.get("steps"); i++) {
-				jsa.push(i);
+				// Use object instead of standard number to get around the handlebars context bug
+				jsa.push({
+					value: i
+				});
 			}
 			this.set("junkStepArray", jsa);
 		}.observes("steps"),
@@ -37,15 +41,25 @@ define([
 			});
 			//return filteredItems;
 			if (filteredItems.length) {
-				return "<strong>NOTE</strong> ";
+				//console.log("filteredItem", filteredItems[0]);
+
+				var noteView = ItemBlock.create({
+					viewModel: filteredItems[0]
+				});
+				return noteView.get("mainView");
 			}
-			else return "";
+			return false;
 		},
 
 		actions: {
 			playPause: function() {
+				if (!App.state.scheduler.get("playing")) App.state.scheduler.play();
+				else App.state.scheduler.pause();
 				console.log("playPause");
 				console.log("playPause", this.get("steps"));
+			},
+			toggleItem: function(step, row) {
+				console.log("addItem", arguments);
 			}
 		}
 	});

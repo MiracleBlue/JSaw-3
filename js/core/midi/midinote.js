@@ -1,5 +1,5 @@
 define(function() {
-	return Ember.Object.extend(Ember.Evented, {
+	return Ember.ObjectController.extend(Ember.Evented, {
 		// This object is designed to be created when a note is sequenced.
 		// It is then sent to an instrument by a sequencer and that sequencer triggers "noteOn",
 		// Which the instrument listens to and uses to know when it's supposed to play the note.
@@ -11,6 +11,7 @@ define(function() {
 		duration: 1,
 		position: 0,
 		selected: false,
+		playing: false,
 		frequency: function() {
 			return App.NoteLib.fromLatin(this.get("key").capitalize() + this.get("octave")).frequency();
 		}.property("key", "octave"),
@@ -25,9 +26,11 @@ define(function() {
 		},
 		noteOn: function() {
 			this.trigger("noteOn");
+			this.set("playing", true);
 		},
 		noteOff: function() {
 			this.trigger("noteOff");
+			this.set("playing", false);
 		}
 	});
 });

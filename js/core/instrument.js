@@ -31,6 +31,7 @@ define([
 				var voice = self.generator.create({
 					midiNote: note
 				});
+				note.noteOn();
 
 				voice.on("complete", function() {
 					voice.node.disconnect(self.node.outputs[0]);
