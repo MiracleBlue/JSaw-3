@@ -18,6 +18,7 @@ define([
 		step: 0,
 		name: "Sequencer Derp",
 		instrument: null,
+		track: null,
 
 		currentlyPlayingNotes: null,
 		pattern: null,
@@ -40,7 +41,7 @@ define([
 
 			var self = this;
 
-			var scheduler = App.state.scheduler;
+			var scheduler = this.get("scheduler") || App.state.scheduler;
 
 			scheduler.on("play", function() {
 				self.set("playing", true);

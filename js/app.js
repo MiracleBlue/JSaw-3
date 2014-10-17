@@ -4,6 +4,8 @@ define([
 	"./core/midi/midinote", // MidiNote
 	"./core/scheduler", // Scheduler
 	"./core/sequencer",
+	"./core/track",
+	"./core/pattern",
 	"./components/supergrid/SuperGrid",
 	"./instruments/default-sawtooth/DefaultSawtooth",
 	"./fastCollection"
@@ -12,6 +14,8 @@ define([
 	MidiNote,
 	Scheduler,
 	Sequencer,
+	Track,
+	Pattern,
 	SuperGrid,
 	DefaultSawtooth,
 	FastCollection
@@ -24,6 +28,7 @@ define([
 		bpm: 130,
 		instruments: null,
 		patterns: null,
+		tracks: null,
 		playlist: null,
 		mixer: null,
 		scheduler: null,
@@ -31,10 +36,48 @@ define([
 		init: function() {
 			this._super();
 			// Do stuff here
+			var self = this;
 
 			this.scheduler = Scheduler.create({
 				audiolet: App.audiolet
 			});
+
+			this.set("instruments", Ember.ArrayController.create({
+				content: [
+					DefaultSawtooth.create()
+				]
+			}));
+
+			this.set("tracks", Ember.ArrayController.create({
+				content: [
+					Track.create({
+						instrument: self.get("instruments").objectAt(0)
+					})
+				]
+			}));
+
+			this.set("patterns", FastCollection.create({
+				content: [
+					Pattern.create({
+						items: [
+							MidiNote.create({key: "A", duration: 4, position: 2}),
+							MidiNote.create({key: "C", duration: 4, position: 2}),
+							MidiNote.create({key: "C", duration: 1, position: 8}),
+							MidiNote.create({key: "F", duration: 1, position: 9})
+						]
+					})
+				]
+			}));
+
+			this.set("playlist", FastCollection.create({
+				content: [
+					Sequencer.create({
+						scheduler: self.get("scheduler"),
+						track: self.get("tracks").objectAt(0),
+						pattern: self.get("patterns").objectAt(0)
+					})
+				]
+			}))
 		}
 	});
 
@@ -137,7 +180,7 @@ define([
 								MidiNote.create({key: "A", duration: 4, position: 2}),
 								MidiNote.create({key: "C", duration: 4, position: 2}),
 								MidiNote.create({key: "C", duration: 1, position: 8}),
-								MidiNote.create({key: "F", duration: 1, position: 9}),
+								MidiNote.create({key: "F", duration: 1, position: 9})
 							]
 						})
 					})

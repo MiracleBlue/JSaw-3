@@ -1,6 +1,7 @@
 define(["../fastCollection"], function(FastCollection) {
 	return Ember.Object.extend(Ember.Evented, {
 		steps: 16,
+		track: 0,
 		position: 0,
 		items: null,
 		name: "Some Pattern",
