@@ -10,7 +10,11 @@ define([
 		rows: null,
 		// todo: refactor so this isn't tied to "patterns"
 		sequencer: null,
+
+		// todo: refactor this shit so that it's not so weirdly named
 		junkStepArray: null,
+		activeStepObject: null,
+
 		init: function () {
 			this._super();
 
@@ -23,9 +27,10 @@ define([
 			var jsa = [];
 			for (var i = 0; i < this.get("steps"); i++) {
 				// Use object instead of standard number to get around the handlebars context bug
-				jsa.push({
-					value: i
-				});
+				jsa.push(Ember.Object.create({
+					value: i,
+					active: false
+				}));
 			}
 			this.set("junkStepArray", jsa);
 		}.observes("steps"),
@@ -33,6 +38,17 @@ define([
 		test: function(val) {
 			return "Hello: " + val;
 		},
+
+		stepChange: function() {
+			var jsa = this.get("junkStepArray");
+			var step = this.get("sequencer.step");
+			var active = this.get("activeStepObject");
+
+			if (active) active.set("active", false);
+
+			jsa[step].set("active", true);
+			this.set("activeStepObject", jsa[step]);
+		}.observes("sequencer.step"),
 
 		lookupItems: function(step, latin) {
 			var filteredItems = this.get("sequencer.pattern.items").getByProperty("position", step);

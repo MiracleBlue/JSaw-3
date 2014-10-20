@@ -176,6 +176,7 @@ define([
 						rows: keys,
 						sequencer: Sequencer.create({
 							instrument: DefaultSawtooth.create(),
+							track: App.state.tracks.objectAt(0),
 							pattern: [
 								MidiNote.create({key: "A", duration: 4, position: 2}),
 								MidiNote.create({key: "C", duration: 4, position: 2}),

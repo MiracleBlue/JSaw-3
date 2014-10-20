@@ -7,13 +7,17 @@
 	{{/if}}
 </button>
 
+<div class="info">
+	Step: {{sequencer.step}}
+</div>
+
 <ul class="step-list">
 	{{#each junkStepArray}}
 		<li {{bind-attr data-step="_view.contentIndex"}}>
-			<ul class="note-list">
+			<ul {{bind-attr class=":note-list active"}}>
 				{{#with value as parentIndex}}
 					{{#each controller.rows}}
-						<li class="step-cell" {{action "toggleItem" parentIndex this}}>{{method controller 'lookupItems' parentIndex latin}}{{latin}}</li>
+						<li class="step-cell" {{action "toggleItem" parentIndex this}}>{{method controller 'lookupItems' parentIndex latin}}</li>
 					{{/each}}
 				{{/with}}
 			</ul>

@@ -35,9 +35,12 @@ define([
 
 			// Notes should be pattern, yeah?  I reckon.
 			// Then pattern can be FastCollection YEAH BABY
-			this.set("pattern", Pattern.create({
-				items: this.get("pattern") || null
-			}));
+			if (!this.get("pattern.steps")) {
+				this.set("pattern", Pattern.create({
+					items: this.get("pattern") || null
+				}));
+			}
+
 
 			var self = this;
 
@@ -84,7 +87,7 @@ define([
 			if (currentNotes.get("length")) {
 				console.log("currentNotes", currentNotes);
 				this.get("currentlyPlayingNotes").addObjects(currentNotes);
-				self.instrument.playNotes(currentNotes);
+				self.track.instrument.playNotes(currentNotes);
 			}
 		}
 	});

@@ -7,13 +7,26 @@
 // Hello
 .note-list {
 	float: left;
+	background: #CCC;
+	&.active {
+		background: #499848;
+	}
 }
 .step-cell {
-	width: 50px;
+	width: 49px;
 	height: 20px;
-	background: #CCC;
 	border-left: 1px solid #333;
 	border-top: 1px solid #333;
 	font-size: 12px;
 	font-family: arial;
+}
+
+.item-block-view {
+	height: 20px;
+	//border: 1px solid #002a80;
+	background: darkorange;
+	position: absolute;
+	&.playing {
+		background: red;
+	}
 }
